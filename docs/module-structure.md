@@ -20,6 +20,7 @@ automated test that fails the build on any unauthorized cross-module import.
 → `presentation` (thin HTTP controllers, zero business logic)
 
 ![Module Strucuture](/screenshots/module-structure.png)
+
 *Project/Module Structure*
 
 ## Current Bounded Contexts
