@@ -19,7 +19,8 @@ automated test that fails the build on any unauthorized cross-module import.
 (orchestration only) → `infrastructure` (JPA, security, external adapters) 
 → `presentation` (thin HTTP controllers, zero business logic)
 
-![Module Strucuture](/educore-schoolos-showcase/screenshots/module-structure.png)
+![Module Strucuture](/screenshots/module-structure.png)
+*Project/Module Structure*
 
 ## Current Bounded Contexts
 Academic Foundation, Student, Attendance, and Assessment/Grading are 
