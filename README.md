@@ -22,5 +22,12 @@ multi-tenancy from day one.
 - [Module Structure](docs/module-structure.md) — enforced architectural 
   boundaries via Spring Modulith
 
+## Proof of Work
+![Test Suite](screenshots/test-suite-passing.png)
+*380+ tests passing across Tier 1 (domain), Tier 2 (Mockito), and Tier 3 
+(Testcontainers) suites.*
+![Swagger UI](screenshots/swagger-ui.png)
+*REST API surface across all bounded contexts.*
+
 ## Stack
 Java 21 · Spring Boot 3.5 · PostgreSQL 16 · Liquibase · Spring Modulith · JWT
