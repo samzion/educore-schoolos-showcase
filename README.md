@@ -1,0 +1,1 @@
+# educore-schoolos-showcase
