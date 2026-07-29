@@ -24,7 +24,7 @@ multi-tenancy from day one.
 
 ## Proof of Work
 ![Test Suite](screenshots/test-suite-passing.png)
-*380+ tests passing across Tier 1 (domain), Tier 2 (Mockito), and Tier 3 
+*492+ tests passing across Tier 1 (domain), Tier 2 (Mockito), and Tier 3 
 (Testcontainers) suites.*
 ![Swagger UI](screenshots/swagger-ui.png)
 *REST API surface across all bounded contexts.*
