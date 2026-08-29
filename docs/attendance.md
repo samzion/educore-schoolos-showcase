@@ -1,24 +1,48 @@
-# Attendance
+# Attendance — From Daily Roll to Operational Health
 
-The reference bounded context for EduCore's aggregate pattern — every module 
-since follows the design established here.
+Attendance became the reference bounded context for EduCoreOS because it forced the project to model authorization, lifecycle, school calendars and operational reporting together.
 
-## Aggregate Design
-Aggregate root owns child entities as in-memory lists. Child mutation methods 
-are package-private, reachable only through the root's own invariant-checked 
-methods — never a generic setter. State transitions are named domain methods.
+## Authority is contextual
 
-## Cross-Module Communication
-Two distinct patterns, used deliberately:
-- **Facts** (e.g. "does this student exist?") → Spring Modulith Named 
-  Interfaces (`student.api.StudentLookup`)
-- **Reactions** (e.g. "something happened elsewhere, react to it") → 
-  `@ApplicationModuleListener` / `ApplicationEventPublisher`, never a direct 
-  service call
+Current MVP rules distinguish between roles and assignment context:
 
-## School-Scope Isolation
-Every service method loading an entity by ID verifies the requesting user's 
-`schoolId` against the entity's. Mismatches return 404, never 403 — the 
-system doesn't reveal that a resource exists outside a school's boundary.
+- designated Class Teacher — mark/save/submit own class;
+- Academic Head — school-wide mark/save/submit/lock;
+- Administrator — school-wide operation plus correction authority;
+- subject-assigned teacher only — no whole-class attendance authority.
 
-Test coverage: Tier 1 domain, Tier 2 Mockito, Tier 3 Testcontainers.
+The backend enforces these rules directly.
+
+## Submission is auditable
+
+Finalized attendance preserves the actual submitter and submission time. Draft/open work does not silently become official attendance.
+
+## School Calendar changes the denominator
+
+A school cannot measure missing attendance correctly without knowing which dates were expected school days.
+
+Academic owns a School Calendar exception model for holidays, closures and makeup/open-day overrides. Attendance health consumes that fact rather than hardcoding “Monday-Friday always counts”.
+
+Attendance itself is not hard-blocked on a closed day: real schools can still hold a makeup session. Calendar status informs expectations; it does not erase valid attendance activity.
+
+## Tracking Effective Date
+
+A school adopting EduCoreOS part-way through a term should not immediately appear non-compliant for all earlier days.
+
+Attendance therefore supports a tracking-effective date. Health calculations begin from the agreed date on which EduCoreOS becomes the authoritative attendance system.
+
+## Health by class
+
+Backend-authoritative health includes concepts such as:
+
+- expected days;
+- submitted days;
+- in-progress days;
+- missing days;
+- completion percentage;
+- latest submission date;
+- states including `HEALTHY`, `NEEDS_ATTENTION`, `NO_ACTIVITY`, `NOT_STARTED` and `NO_STUDENTS`.
+
+## Design lesson
+
+A useful attendance module does not merely store status rows. It models when attendance is expected, who is authorized to finalize it, what counts as official, and where operational follow-up is needed.

@@ -1,30 +1,48 @@
-# Assessment
+# Assessment — Configurable Policy, Progressive Scoring, Controlled Finality
 
-Three aggregates modeling how a real Nigerian school actually grades — built 
-after direct conversation with the pilot school about their real components, 
-not an assumed universal model.
+Assessment was modeled from the pilot school's real grading process rather than from a universal hardcoded “test/exam” enum.
 
-## Why Assessment Components Are Free Text, Not an Enum
-Real grading components — Classwork, Homework, Weekly Test, Mid-Term Exam, 
-Exam — don't match any fixed universal set, and other schools are expected to 
-differ further. `ComponentName` is a validated free-text value object 
-instead: schools configure their own weighting scheme as data, not code.
+## Three aggregates
 
-## Aggregates
-- **AssessmentPolicy** — one per `(school, education level)`. Enabled 
-  components must sum to exactly 100% weighting; enforced as a domain 
-  invariant.
-- **AssessmentTemplate** — a reusable assessment definition (title, type, 
-  duration, max score), permanently archivable.
-- **Assessment** — the operational aggregate. A 7-state lifecycle 
-  (`DRAFT → OPEN → SUBMITTED → REOPENED → APPROVED → LOCKED → ARCHIVED`), 
-  with `StudentScore` as a child entity tracking raw and weighted scores per 
-  student, and an append-only `ModerationRecord` for score corrections.
+### AssessmentPolicy
 
-## Design Principle: Policy Is Static, Scoring Is Progressive
-Policy configuration is one atomic admin action (always fully valid, or it 
-doesn't exist). Individual score entry happens progressively across a term. 
-Two separate concerns, deliberately not conflated.
+Defines the weighted component structure for an educational context. Component names are validated school-configured data rather than a closed enum.
 
-Role-based authorization on all mutating endpoints. Full Tier 1/2/3 test 
-coverage across all three aggregates.
+A structural policy is atomic and fully valid whenever it exists: enabled weighting totals 100%. Structural replacement is guarded once historical templates/assessments depend on the policy so score meaning cannot silently change later.
+
+### AssessmentTemplate
+
+A reusable definition such as title/type/duration/maximum score. Templates can be archived; deletion is restricted once used by historical assessments.
+
+### Assessment
+
+The operational scoring aggregate. Its lifecycle includes:
+
+```text
+DRAFT → OPEN → SUBMITTED → APPROVED → LOCKED → ARCHIVED
+                 ↓
+             REOPENED → OPEN
+```
+
+Scores evolve progressively while editing is allowed. Submission, moderation, approval and locking are explicit business transitions.
+
+## Score history and moderation
+
+Student scores belong to the Assessment aggregate. Moderation records are append-only audit history rather than overwriting the fact that a score changed.
+
+## Contextual authorization
+
+Teacher operations require the correct active class/subject assignment. Academic Head and Administrator workflows have different review/governance authority.
+
+## Historical integrity
+
+The project has repeatedly favored historical truth over convenient mutation:
+
+- policy structure cannot be changed casually after use;
+- used templates are retained/archived;
+- submitted/approved/locked assessment states become increasingly constrained;
+- moderation records explain score corrections.
+
+## Deliberate MVP boundary
+
+The Assessment engine is not the same thing as a complete report-card publication lifecycle. Expected subject coverage, report-card approval/publication and printable report artifacts remain separate product work rather than being fabricated from the current Assessment state.

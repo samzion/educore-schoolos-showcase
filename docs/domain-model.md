@@ -1,107 +1,85 @@
-# Domain Model — Assessment
+# Representative Domain Patterns
 
-Representative excerpts from the `Assessment` bounded context, showing the 
-invariant-guarded aggregate pattern used across EduCore.
+These examples are intentionally simplified representations of patterns used in the private EduCoreOS repositories. They communicate the design without publishing client-sensitive or proprietary implementation detail.
 
-## Aggregate Root — State Transitions Are Named Methods, Never Setters
+## Assessment lifecycle: named transitions, not status setters
 
 ```java
 public void submit(UUID submittedBy, Instant now, Set<UUID> requiredStudentIds) {
     assertTransitionAllowed(AssessmentStatus.SUBMITTED);
     assertSubmissionComplete(requiredStudentIds);
     approval.recordSubmission(submittedBy, now);
-    this.status = AssessmentStatus.SUBMITTED;
-}
-
-private void assertTransitionAllowed(AssessmentStatus target) {
-    if (!status.canTransitionTo(target)) {
-        throw new IllegalStateException(
-                "Cannot transition assessment from " + status + " to " + target);
-    }
-}
-
-private void assertSubmissionComplete(Set<UUID> requiredStudentIds) {
-    Set<UUID> scoredStudentIds = studentScores.stream()
-            .map(StudentScore::studentId)
-            .collect(Collectors.toSet());
-    if (!scoredStudentIds.containsAll(requiredStudentIds)) {
-        throw new IllegalStateException(
-                "Cannot submit: scores are missing for one or more enrolled students");
-    }
+    status = AssessmentStatus.SUBMITTED;
 }
 ```
 
-Submission isn't just a status flip — it's guarded by a real business rule 
-(every enrolled student must have a score) enforced inside the aggregate 
-itself, not in a controller or service.
+Submission is not equivalent to `setStatus(SUBMITTED)`. The aggregate verifies that the transition is legal and that the roster is complete before state changes.
 
-## Invariant Enforcement — AssessmentPolicy
+## AssessmentPolicy: atomic structural configuration
 
-An `AssessmentPolicy`'s enabled components must always sum to exactly 100% 
-weighting. This is checked after every mutation that could break it — adding, 
-enabling, disabling, or reweighting a component — not just at creation:
+An Assessment Policy must be structurally valid whenever it exists. Enabled component weightings total exactly 100%.
+
+An earlier implementation attempted to validate that invariant after each individual component mutation. That was flawed: during construction, the first component naturally creates a temporary total below 100%.
+
+The corrected design treats structural policy definition/replacement as an atomic operation:
 
 ```java
-public void disableComponent(UUID componentId) {
-    assertAtLeastOneEnabledRemainsAfterDisabling(componentId);
-    getComponent(componentId).disable();
-    assertTotalWeightingValid();
-}
+public static AssessmentPolicy create(
+        UUID schoolId,
+        UUID educationLevelId,
+        PolicyName name,
+        List<ComponentDefinition> definitions) {
 
-private void assertTotalWeightingValid() {
-    List<AssessmentComponent> enabledComponents = components.stream()
-            .filter(AssessmentComponent::isEnabled)
-            .toList();
-
-    if (enabledComponents.isEmpty()) {
-        throw new IllegalStateException("At least one assessment component must exist");
-    }
-
-    BigDecimal total = enabledComponents.stream()
-            .map(c -> c.weighting().percentage())
-            .reduce(BigDecimal.ZERO, BigDecimal::add);
-
-    if (total.compareTo(BigDecimal.valueOf(100)) != 0) {
-        throw new IllegalStateException(
-                "Total weighting of enabled components must equal 100%, currently: " + total + "%");
-    }
+    AssessmentPolicy policy = new AssessmentPolicy(...);
+    policy.replaceComponents(definitions);
+    policy.assertValidStructure();
+    return policy;
 }
 ```
 
-A policy is either fully valid or it doesn't exist — there's no intermediate 
-"draft" state where weighting can sit at, say, 85%.
+Once a policy has historical dependants, structural replacement is guarded. A safe human-readable rename can remain possible without changing historical score meaning.
 
-## School-Scope Isolation — Application Layer
+## Cross-module facts through published contracts
 
-Every read enforces multi-tenant isolation at the repository query itself, 
-and returns 404 rather than 403 on a school mismatch — so the system never 
-confirms a resource exists outside a school's boundary:
+Assessment does not load a Student aggregate from Student internals. The application layer asks a published lookup for the fact it needs:
+
+```java
+Set<UUID> requiredStudents =
+        studentLookup.activeStudentIdsInClassGroup(classGroupId, schoolId);
+
+assessment.submit(currentUserId, clock.instant(), requiredStudents);
+```
+
+The aggregate receives the information required to enforce its own rule; it does not reach into another module.
+
+## Tenant-scoped retrieval
 
 ```java
 @Transactional(readOnly = true)
 public Assessment getAssessment(UUID assessmentId, UUID schoolId) {
-    return assessmentRepository.findById(assessmentId, schoolId)
+    return repository.findById(assessmentId, schoolId)
             .orElseThrow(() -> new ResourceNotFoundException("Assessment not found"));
 }
 ```
 
-## Cross-Module Facts, Not Cross-Module Objects
+Tenant scope is part of retrieval, not a UI convention.
 
-`AssessmentService` depends on `student.api.StudentLookup` — a published 
-Spring Modulith Named Interface — rather than reaching into the Student 
-module's internals:
+## Finance: correction as explicit lifecycle
 
-```java
-Set<UUID> requiredStudentIds = new HashSet<>(
-        studentLookup.activeStudentIdsInClassGroup(assessment.classGroupId()));
-assessment.submit(submittedBy, Instant.now(), requiredStudentIds);
+A paid invoice cannot simply disappear. A correction may require releasing allocation back to credit before the invoice is voided and a corrected obligation is created.
+
+```text
+payment receipt (preserved)
+        ↓
+allocation released
+        ↓
+student credit
+        ↓
+wrong invoice VOID
+        ↓
+correct invoice
+        ↓
+credit reallocated
 ```
 
-The aggregate itself never queries another module — the application service 
-gathers what it needs and passes it in as a parameter.
-
----
-
-*Excerpts are taken directly from the private pilot repository's domain and 
-application layers. No student, guardian, or school-identifying data is 
-included — only structural and business-rule logic.*
+The important domain property is not the syntax of a specific method. It is that the final ledger can still explain the entire story.
