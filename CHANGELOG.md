@@ -1,5 +1,25 @@
 # Showcase Changelog
 
+## 2026-08 — Showcase v4
+
+This update replaces the placeholder visual-proof plan with sanitized screenshots captured from the current running EduCoreOS application.
+
+### Added
+- Sanitized current Admin Dashboard screenshot.
+- Sanitized current School Setup / Readiness screenshot.
+- Sanitized current Students screenshot.
+- Sanitized current Attendance screenshot.
+- Sanitized current Assessment Governance screenshot.
+- Sanitized current Finance / Student Account screenshot.
+- Sanitized current Staff Management screenshot.
+- Sanitized current School Calendar screenshot.
+- Additional screenshots retained in assets for Academic Head dashboard and Student Profile.
+
+### Corrected
+- README now presents actual current product screenshots instead of only historical milestone evidence.
+- The showcase visual layer now demonstrates real operational UI across the major pilot-ready areas.
+
+
 ## 2026-08 — Showcase v3
 
 The showcase was reconciled again against the latest supplied frontend/backend/Screens workspace rather than relying only on historical tracker state.

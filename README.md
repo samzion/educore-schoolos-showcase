@@ -67,12 +67,37 @@ The current release candidate baseline reported by the private repositories is:
 - Frontend and backend production images: **built locally and runtime-smoke-tested**
 - External deployment: **not yet declared GO** — infrastructure/security/backup/monitoring gates require direct production evidence
 
-The public showcase currently uses genuine engineering evidence plus the product's own current branding. Sanitized live product captures will replace the historical milestone screenshots as they are captured from a running release candidate.
+The public showcase now combines genuine engineering evidence with sanitized screenshots captured from a running EduCoreOS release candidate.
 
 ![Automated test milestone](assets/screenshots/test-suite-passing.png)
 
 ---
 
+
+## Sanitized Product Screens — Current Release Candidate
+
+The following screenshots were captured from the current EduCoreOS application using sanitized/demo tenant data. They are intended to show the actual operational surface area rather than design mockups or Swagger-only evidence.
+
+<table>
+  <tr>
+    <td align="center"><strong>Admin Dashboard</strong><br><img src="assets/screenshots/admin-dashboard.png" alt="EduCoreOS Admin Dashboard" width="100%"></td>
+    <td align="center"><strong>School Setup / Readiness</strong><br><img src="assets/screenshots/school-setup.png" alt="EduCoreOS School Setup" width="100%"></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>Students</strong><br><img src="assets/screenshots/students.png" alt="EduCoreOS Students" width="100%"></td>
+    <td align="center"><strong>Attendance</strong><br><img src="assets/screenshots/attendance.png" alt="EduCoreOS Attendance" width="100%"></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>Assessment Governance</strong><br><img src="assets/screenshots/assessment.png" alt="EduCoreOS Assessment Governance" width="100%"></td>
+    <td align="center"><strong>Finance / Student Account</strong><br><img src="assets/screenshots/finance-student-account.png" alt="EduCoreOS Student Finance Account" width="100%"></td>
+  </tr>
+  <tr>
+    <td align="center"><strong>Staff Management</strong><br><img src="assets/screenshots/staff-management.png" alt="EduCoreOS Staff Management" width="100%"></td>
+    <td align="center"><strong>School Calendar</strong><br><img src="assets/screenshots/school-calendar.png" alt="EduCoreOS School Calendar" width="100%"></td>
+  </tr>
+</table>
+
+Additional role-specific/product screens are also included in the repository assets, including an Academic Head dashboard and a Student Profile view.
 
 ## Current Frontend Surface — Verified from Source
 
