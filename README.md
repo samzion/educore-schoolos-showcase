@@ -10,6 +10,8 @@ The production codebase is private because the project is being prepared for a r
 **Backend:** Java 21 · Spring Boot 3.5 · PostgreSQL 16 · Liquibase · Spring Modulith · JWT · Testcontainers  
 **Frontend:** React 19 · TypeScript · Vite · TanStack Query  
 
+![EduCoreOS product positioning](assets/brand/og-image.png)
+
 ---
 
 ## Why EduCoreOS Exists
@@ -42,7 +44,7 @@ The pilot is intentionally narrow. The goal is not to ship every possible school
 | Assessment core | **Pilot-ready** |
 | Finance | **Pilot-ready** |
 | Role-specific dashboards | **Pilot-ready** |
-| School Calendar domain/API | **Implemented** — current UI is being re-audited against approved screens |
+| School Calendar | **Implemented and routed** — available from both Academics and School Setup; approved-screen alignment remains part of the UI quality audit |
 | Approved Screens vs Current UI audit | **In progress before external rollout** |
 | Results / Report Card lifecycle | **Deliberately deferred** |
 | Timetable / Scheduling | **Deliberately deferred** |
@@ -65,9 +67,35 @@ The current release candidate baseline reported by the private repositories is:
 - Frontend and backend production images: **built locally and runtime-smoke-tested**
 - External deployment: **not yet declared GO** — infrastructure/security/backup/monitoring gates require direct production evidence
 
-The screenshots below are retained as earlier engineering milestones; the showcase is being refreshed with current product screenshots as the UI audit closes.
+The public showcase currently uses genuine engineering evidence plus the product's own current branding. Sanitized live product captures will replace the historical milestone screenshots as they are captured from a running release candidate.
 
 ![Automated test milestone](assets/screenshots/test-suite-passing.png)
+
+---
+
+
+## Current Frontend Surface — Verified from Source
+
+The August 2026 private frontend snapshot contains real routed pages for all five role workspaces plus the core operational areas: Students, Attendance, Assessment, Finance, Staff, School Setup and Academics.
+
+A few examples from the current router:
+
+| Product area | Current route | Evidence in current frontend |
+|---|---|---|
+| Admin dashboard | `/app/dashboard` | `AdminDashboardPage` |
+| School setup / readiness | `/app/settings` | `SchoolSetupPage` |
+| Attendance | `/app/attendance` | `AttendancePage` |
+| Students | `/app/students` | `StudentListPage` |
+| Assessments | `/app/assessments` | `AssessmentListPage` |
+| Finance | `/app/finance` | `FinancePage` |
+| Student finance account | `/app/finance/students/:studentId` | `StudentFinanceAccountPage` |
+| Staff | `/app/staff` | `StaffListPage` |
+| Teacher assignments | `/app/settings/teaching-assignments` | `TeachingAssignmentsPage` |
+| School Calendar | `/app/academics/calendar` and `/app/settings/calendar` | `SchoolCalendarPage` |
+
+This is an important correction to the earlier showcase: **School Calendar is present in the current frontend route table**, not just in backend/domain support. What remains separate is the screen-by-screen alignment review against the approved design inventory.
+
+[See the complete current UI implementation map →](docs/current-ui-map.md)
 
 ---
 
@@ -228,7 +256,7 @@ Those distinctions are deliberate. Engineering credibility is more important tha
 
 This repository will continue to be updated with:
 
-- current, sanitized product screenshots after the screen-alignment audit;
+- current, sanitized product screenshots captured from a running release candidate;
 - architecture diagrams that reflect the current bounded contexts;
 - additional write-ups on Finance, setup/readiness and deployment engineering;
 - selected engineering lessons and incident-style bug analyses;
@@ -256,6 +284,7 @@ See [`CHANGELOG.md`](CHANGELOG.md) for showcase updates.
     ├── finance.md
     ├── module-structure.md
     ├── school-setup.md
+    ├── current-ui-map.md
     └── security-and-tenancy.md
 ```
 
