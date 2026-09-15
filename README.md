@@ -59,7 +59,7 @@ The pilot is intentionally narrow. The goal is not to ship every possible school
 
 The current release candidate baseline reported by the private repositories is:
 
-- **913 / 913 backend tests passing**
+- **1063 / 1063 backend tests passing**
 - **183 / 183 frontend tests passing across 27 files**
 - TypeScript project check: **PASS**
 - Frontend production build: **PASS**
